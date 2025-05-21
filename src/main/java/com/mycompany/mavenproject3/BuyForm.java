@@ -32,6 +32,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
 public class BuyForm extends JFrame {
+    private JComboBox<String> customerField;
     private JComboBox<String> productField;
     private JTextField stockField;
     private JTextField priceField;
@@ -39,10 +40,12 @@ public class BuyForm extends JFrame {
     private JTextField descField;
     private JButton orderButton;
     private List<Product> products;
+    private List<Customer> customers;
     private Mavenproject3 mainApp;
 
     public BuyForm(Mavenproject3 mainApp) {
         this.mainApp = mainApp;
+        this.customers = mainApp.getCustomerList(); 
         this.products = mainApp.getProductList();
 
         setTitle("WK. Cuan | Beli Barang");
@@ -55,8 +58,19 @@ public class BuyForm extends JFrame {
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Dropdown produk
+        // Nama Customer
         gbc.gridx = 0; gbc.gridy = 0;
+        sellPanel.add(new JLabel("Customer:"), gbc);
+
+        customerField = new JComboBox<>();
+        for (Customer c : customers) {
+            customerField.addItem(c.getName());
+        }        
+        gbc.gridx = 1;
+        sellPanel.add(customerField, gbc);
+
+        // Dropdown produk
+        gbc.gridx = 0; gbc.gridy = 1;
         sellPanel.add(new JLabel("Barang:"), gbc);
 
         productField = new JComboBox<>();
@@ -66,8 +80,17 @@ public class BuyForm extends JFrame {
         gbc.gridx = 1;
         sellPanel.add(productField, gbc);
 
+        // Stok
+        gbc.gridx = 0; gbc.gridy = 2;
+        sellPanel.add(new JLabel("Stok:"), gbc);
+
+        stockField = new JTextField(10);
+        stockField.setEditable(false);
+        gbc.gridx = 1;
+        sellPanel.add(stockField, gbc);
+
         // Deskripsi
-        gbc.gridx = 0; gbc.gridy = 1;
+        gbc.gridx = 0; gbc.gridy = 3;
         sellPanel.add(new JLabel("Deskripsi:"), gbc);
 
         descField = new JTextField(10);
@@ -76,7 +99,7 @@ public class BuyForm extends JFrame {
         sellPanel.add(descField, gbc);
 
         // Harga
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 4;
         sellPanel.add(new JLabel("Harga Jual:"), gbc);
 
         priceField = new JTextField(10);
@@ -85,7 +108,7 @@ public class BuyForm extends JFrame {
         sellPanel.add(priceField, gbc);
 
         // Qty
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 5;
         sellPanel.add(new JLabel("Qty:"), gbc);
 
         qtyField = new JTextField(10);
@@ -93,16 +116,15 @@ public class BuyForm extends JFrame {
         sellPanel.add(qtyField, gbc);
 
         // Tombol pesan
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         orderButton = new JButton("Pesan");
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
         sellPanel.add(orderButton, gbc);
 
         add(sellPanel);
 
-        // Listener: Update stok dan harga saat produk dipilih
         productField.addActionListener(e -> updateFields());
 
-        // Listener: Tombol Proses
+        // Listener Tombol Proses
         orderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -120,10 +142,11 @@ public class BuyForm extends JFrame {
                         JOptionPane.showMessageDialog(BuyForm.this, "Stok tidak mencukupi!");
                         return;
                     }
-                    double total = selectedProduct.getPrice() * qty;
-                    selectedProduct.total(total);
 
-                    selectedProduct.setStock(selectedProduct.getStock() - qty);
+                    // Main Proses
+                    double total = selectedProduct.getPrice() * qty; // Hitung Total
+                    selectedProduct.setPrice(selectedProduct.getOriginalPrice()); // Balikin Harga Jual jadi harga awal
+                    selectedProduct.setStock(selectedProduct.getStock() - qty); // Mengurangi Stok
 
                     JOptionPane.showMessageDialog(BuyForm.this, "Transaksi berhasil!\nTotal Harga: " + total);
 

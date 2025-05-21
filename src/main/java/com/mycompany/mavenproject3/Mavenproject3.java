@@ -15,6 +15,7 @@ public class Mavenproject3 extends JFrame implements Runnable {
     private JButton buyProductButton;
     private JButton history;
     private List<Product> productList = new ArrayList<>();
+    private List<Customer> customerList = new ArrayList<>();
 
     public Mavenproject3() {
         setTitle("WK. STI Chill");
@@ -29,6 +30,7 @@ public class Mavenproject3 extends JFrame implements Runnable {
         productList.add(new Product(4, "P004", "Matcha Frappucino", "Tea", 28000, 10));
         productList.add(new Product(5, "P005", "Jus Apel", "Juice", 17000, 10));
         
+        customerList.add(new Customer(1, "Budi", true));
         this.text = getBannerTextFromProducts();
         this.x = -getFontMetrics(new Font("Arial", Font.BOLD, 18)).stringWidth(text);
 
@@ -41,15 +43,12 @@ public class Mavenproject3 extends JFrame implements Runnable {
 
         addProductButton = new JButton("Kelola Produk");
         bottomPanel.add(addProductButton);
-        add(bottomPanel, BorderLayout.SOUTH);
         
         sellProductButton = new JButton("Jual Produk");
         bottomPanel.add(sellProductButton);
-        add(bottomPanel, BorderLayout.SOUTH);
 
         buyProductButton = new JButton("Beli Produk");
         bottomPanel.add(buyProductButton);
-        add(bottomPanel, BorderLayout.SOUTH);
 
         history = new JButton("History Pembelian");
         bottomPanel.add(history);
@@ -105,6 +104,10 @@ public class Mavenproject3 extends JFrame implements Runnable {
 
     public List<Product> getProductList() {
         return productList;
+    }
+    
+    public List<Customer> getCustomerList() {
+        return customerList;
     }
 
     @Override
