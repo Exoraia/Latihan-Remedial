@@ -11,65 +11,93 @@ public class Mavenproject3 extends JFrame implements Runnable {
     private int width;
     private BannerPanel bannerPanel;
     private JButton addProductButton;
+    private JButton viewCustomerButton;
     private JButton sellProductButton;
-    private JButton buyProductButton;
-    private JButton history;
+    private JButton reportButton;
     private List<Product> productList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
+    private List<Unit> unitList = new ArrayList<>();
+    private List<History> historyList = new ArrayList<>();
 
     public Mavenproject3() {
-        setTitle("WK. STI Chill");
-        setSize(600, 150);
+        setTitle("WK. STI Chill | Tampilan Penjual");
+        setSize(800, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout());
 
         productList.add(new Product(1, "P001", "Americano", "Coffee", 10000, 10));
-        productList.add(new Product(2, "P002", "Pandan Latte", "Coffee", 20000, 10));
-        productList.add(new Product(3, "P003", "Aren Latte", "Coffee", 15000, 10));
+        productList.add(new Product(2, "P002", "Pandan Latte", "Diary", 20000, 10));
+        productList.add(new Product(3, "P003", "Root Beer", "Soda", 15000, 10));
         productList.add(new Product(4, "P004", "Matcha Frappucino", "Tea", 28000, 10));
         productList.add(new Product(5, "P005", "Jus Apel", "Juice", 17000, 10));
         
-        customerList.add(new Customer(1, "Budi", true));
+        customerList.add(new Customer(1, "Budi", "email123@gmail.com", "admin123", true));
+
         this.text = getBannerTextFromProducts();
         this.x = -getFontMetrics(new Font("Arial", Font.BOLD, 18)).stringWidth(text);
 
-        // Panel teks berjalan
+        // Panel Menu
         bannerPanel = new BannerPanel();
         add(bannerPanel, BorderLayout.CENTER);
 
-        // Tombol "Kelola Produk"
-        JPanel bottomPanel = new JPanel();
+        // Panel Tombol
+        JPanel leftPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(0, 4, 8, 4);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
+        gbc.gridx = 0; gbc.gridy = 0;
+        JLabel titleLabel = new JLabel("Home");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        leftPanel.add(titleLabel, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 1;
         addProductButton = new JButton("Kelola Produk");
-        bottomPanel.add(addProductButton);
-        
+        leftPanel.add(addProductButton, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
+        viewCustomerButton = new JButton("Kelola Customer");
+        leftPanel.add(viewCustomerButton, gbc);
+    
+        gbc.gridx = 0; gbc.gridy = 3;
         sellProductButton = new JButton("Jual Produk");
-        bottomPanel.add(sellProductButton);
+        leftPanel.add(sellProductButton, gbc);
 
-        buyProductButton = new JButton("Beli Produk");
-        bottomPanel.add(buyProductButton);
+        gbc.gridx = 0; gbc.gridy = 4;
+        reportButton = new JButton("Laporan Pembelian");
+        leftPanel.add(reportButton, gbc);
 
-        history = new JButton("History Pembelian");
-        bottomPanel.add(history);
-        add(bottomPanel, BorderLayout.SOUTH);
+        JPanel wrapperPanel = new JPanel(new BorderLayout());
+        wrapperPanel.add(leftPanel, BorderLayout.NORTH);
+        
+        wrapperPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 0, 1, Color.GRAY));
+
+        add(wrapperPanel, BorderLayout.WEST);
 
         addProductButton.addActionListener(e -> {
             new ProductForm(this).setVisible(true);
+        });
+
+        viewCustomerButton.addActionListener(e -> {
+            new CustomerForm(this).setVisible(true);
         });
 
         sellProductButton.addActionListener(e -> {
             new SellForm(this).setVisible(true);
         });
 
-        buyProductButton.addActionListener(e -> {
-            new BuyForm(this).setVisible(true);
+        reportButton.addActionListener(e -> {
+            new HistoryForm(this).setVisible(true);
         });
 
         setVisible(true);
 
         Thread thread = new Thread(this);
         thread.start();
+
+        new CustomerWindow(this).setVisible(true);
     }
 
     class BannerPanel extends JPanel {
@@ -88,14 +116,25 @@ public class Mavenproject3 extends JFrame implements Runnable {
     }
     
     public String getBannerTextFromProducts() {
-        StringBuilder sb = new StringBuilder("Menu yang tersedia: ");
+        StringBuilder sb = new StringBuilder("Menu yang masih ada: ");
         for (int i = 0; i < productList.size(); i++) {
-            sb.append(productList.get(i).getName());
-            if (i < productList.size() - 1) {
-                sb.append(" | ");
+            if (productList.get(i).getStock() > 0) {
+                sb.append(productList.get(i).getName());
+                if (i < productList.size() - 1) {
+                    sb.append(" | ");
+                }
             }
         }
         return sb.toString();
+    }
+
+    public String getPriceByProductName(String productName) {
+        for (Product p : productList) {
+            if (p.getName().equalsIgnoreCase(productName)) { 
+                return String.valueOf(p.getPrice());       
+            }
+        }
+        return "Product not found";
     }
 
     public void refreshBanner() {
@@ -108,6 +147,14 @@ public class Mavenproject3 extends JFrame implements Runnable {
     
     public List<Customer> getCustomerList() {
         return customerList;
+    }
+
+    public List<History> getHistoryList() {
+        return historyList;
+    }
+
+    public void addHistory(History h) {
+        historyList.add(h);
     }
 
     @Override
@@ -131,5 +178,3 @@ public class Mavenproject3 extends JFrame implements Runnable {
         new Mavenproject3();
     }
 }
-
-// Perubahan Nama Commit

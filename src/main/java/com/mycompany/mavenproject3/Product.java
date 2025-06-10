@@ -34,6 +34,7 @@ public class Product {
     public double getPrice() { return price; }
     public int getStock() { return stock; }
     public double getOriginalPrice() { return originalPrice; }
+    
     public void setStock(int stock) { this.stock = stock; }
     public void setPrice(double price) {this.price = price; }
     public void total (double price) {this.price = price;}

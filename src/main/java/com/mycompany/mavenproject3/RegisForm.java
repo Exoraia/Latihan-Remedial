@@ -33,7 +33,9 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class RegisForm extends JFrame {
     private JTextField customerField;
+    private JTextField emailField;
     private JTextField passwordField;
+    private JComboBox genderBox;
     private JButton regisButton;
     private List<Customer> customers;
     private Mavenproject3 mainApp;
@@ -60,8 +62,24 @@ public class RegisForm extends JFrame {
         gbc.gridx = 1;
         regisPanel.add(customerField, gbc);
 
-        // Password
+        // Gender
+        gbc.gridx = 0; gbc.gridy = 1;
+        regisPanel.add(new JLabel("Gender:"), gbc);
+
+        genderBox = new JComboBox<>(new String[] {"Pria", "Wanita"});
+        gbc.gridx = 1;
+        regisPanel.add(genderBox, gbc);
+
+        // Email
         gbc.gridx = 0; gbc.gridy = 2;
+        regisPanel.add(new JLabel("Email:"), gbc);
+
+        emailField = new JTextField(10);
+        gbc.gridx = 1;
+        regisPanel.add(emailField, gbc);
+
+        // Password
+        gbc.gridx = 0; gbc.gridy = 3;
         regisPanel.add(new JLabel("Password:"), gbc);
 
         passwordField = new JTextField(10);
@@ -69,8 +87,34 @@ public class RegisForm extends JFrame {
         regisPanel.add(passwordField, gbc);
 
         // Regis Button
-        regisButton = new JButton("Pesan");
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
+        regisButton = new JButton("Buat Akun");
+        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
         regisPanel.add(regisButton, gbc);
+
+        add(regisPanel);
+        setVisible(true);
+
+        regisButton.addActionListener(e -> {
+            String nama = customerField.getText().trim();
+            String gender = (String) genderBox.getSelectedItem();
+            String email = emailField.getText().trim();
+            String password = passwordField.getText().trim();
+
+            if (nama.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            boolean genderValue = gender.equals("Pria");
+
+            int newId = customers.size() + 1; 
+            
+            Customer newCustomer = new Customer(newId, nama, email, password, genderValue);
+            customers.add(newCustomer);
+
+            JOptionPane.showMessageDialog(this, "Registrasi berhasil!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
+            new BuyForm(mainApp).setVisible(true);
+            dispose(); // tutup form setelah sukses
+        });
     }
 }

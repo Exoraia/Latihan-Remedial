@@ -5,7 +5,9 @@
 package com.mycompany.mavenproject3;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,110 +28,134 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
 public class BuyForm extends JFrame {
-    private JComboBox<String> customerField;
-    private JComboBox<String> productField;
+    private JComboBox<String> customerBox;
+    private JComboBox<String> productBox;
+    private JComboBox<String> unitBox;
+
     private JTextField stockField;
     private JTextField priceField;
     private JTextField qtyField;
-    private JTextField descField;
+
     private JButton orderButton;
+    private JButton regisButton;
+
     private List<Product> products;
     private List<Customer> customers;
+    private List<Unit> units;
+
     private Mavenproject3 mainApp;
 
     public BuyForm(Mavenproject3 mainApp) {
         this.mainApp = mainApp;
-        this.customers = mainApp.getCustomerList(); 
+        this.customers = mainApp.getCustomerList();
         this.products = mainApp.getProductList();
+
+        this.units = new ArrayList<>();
+        units.add(new Unit("Botol", 1));
+        units.add(new Unit("Box", 12));
 
         setTitle("WK. Cuan | Beli Barang");
         setSize(400, 300);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel sellPanel = new JPanel(new GridBagLayout());
+        JPanel buyPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Nama Customer
+        // Customer
         gbc.gridx = 0; gbc.gridy = 0;
-        sellPanel.add(new JLabel("Customer:"), gbc);
+        buyPanel.add(new JLabel("Customer:"), gbc);
 
-        customerField = new JComboBox<>();
+        customerBox = new JComboBox<>();
         for (Customer c : customers) {
-            customerField.addItem(c.getName());
-        }        
-        gbc.gridx = 1;
-        sellPanel.add(customerField, gbc);
-
-        // Dropdown produk
-        gbc.gridx = 0; gbc.gridy = 1;
-        sellPanel.add(new JLabel("Barang:"), gbc);
-
-        productField = new JComboBox<>();
-        for (Product p : products) {
-            productField.addItem(p.getName());
+            customerBox.addItem(c.getName());
         }
         gbc.gridx = 1;
-        sellPanel.add(productField, gbc);
+        buyPanel.add(customerBox, gbc);
+
+        // Barang
+        gbc.gridx = 0; gbc.gridy = 1;
+        buyPanel.add(new JLabel("Barang:"), gbc);
+
+        productBox = new JComboBox<>();
+        for (Product p : products) {
+            productBox.addItem(p.getName());
+        }
+        gbc.gridx = 1;
+        buyPanel.add(productBox, gbc);
+
+        // Satuan
+        gbc.gridx = 0; gbc.gridy = 2;
+        buyPanel.add(new JLabel("Satuan:"), gbc);
+
+        unitBox = new JComboBox<>();
+        for (Unit u : units) {
+            unitBox.addItem(u.getSatuan());
+        }
+        gbc.gridx = 1;
+        buyPanel.add(unitBox, gbc);
 
         // Stok
-        gbc.gridx = 0; gbc.gridy = 2;
-        sellPanel.add(new JLabel("Stok:"), gbc);
+        gbc.gridx = 0; gbc.gridy = 3;
+        buyPanel.add(new JLabel("Stok:"), gbc);
 
         stockField = new JTextField(10);
         stockField.setEditable(false);
         gbc.gridx = 1;
-        sellPanel.add(stockField, gbc);
+        buyPanel.add(stockField, gbc);
 
-        // Deskripsi
-        gbc.gridx = 0; gbc.gridy = 3;
-        sellPanel.add(new JLabel("Deskripsi:"), gbc);
-
-        descField = new JTextField(10);
-        descField.setEditable(false);
-        gbc.gridx = 1;
-        sellPanel.add(descField, gbc);
-
-        // Harga
+        // Harga Jual
         gbc.gridx = 0; gbc.gridy = 4;
-        sellPanel.add(new JLabel("Harga Jual:"), gbc);
+        buyPanel.add(new JLabel("Harga Jual:"), gbc);
 
         priceField = new JTextField(10);
         priceField.setEditable(false);
         gbc.gridx = 1;
-        sellPanel.add(priceField, gbc);
+        buyPanel.add(priceField, gbc);
 
         // Qty
         gbc.gridx = 0; gbc.gridy = 5;
-        sellPanel.add(new JLabel("Qty:"), gbc);
+        buyPanel.add(new JLabel("Qty:"), gbc);
 
         qtyField = new JTextField(10);
         gbc.gridx = 1;
-        sellPanel.add(qtyField, gbc);
+        buyPanel.add(qtyField, gbc);
 
-        // Tombol pesan
-        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
+        // Register
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 1;
+        regisButton = new JButton("Register");
+        buyPanel.add(regisButton, gbc);
+
+        // Pesan
+        gbc.gridx = 1; gbc.gridy = 6; gbc.gridwidth = 1;
         orderButton = new JButton("Pesan");
-        sellPanel.add(orderButton, gbc);
+        buyPanel.add(orderButton, gbc);
 
-        add(sellPanel);
+        add(buyPanel);
 
-        productField.addActionListener(e -> updateFields());
+        productBox.addActionListener(e -> updateFields());
+        unitBox.addActionListener(e -> updateFields());
 
-        // Listener Tombol Proses
         orderButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedIndex = productField.getSelectedIndex();
-                Product selectedProduct = products.get(selectedIndex);
+                int productIndex = productBox.getSelectedIndex();
+                int unitIndex = unitBox.getSelectedIndex();
+
+                if (productIndex == -1 || unitIndex == -1) return;
+
+                Product selectedProduct = products.get(productIndex);
+                Unit selectedUnit = units.get(unitIndex);
+
                 try {
                     int qty = Integer.parseInt(qtyField.getText());
 
@@ -138,44 +164,60 @@ public class BuyForm extends JFrame {
                         return;
                     }
 
-                    if (qty > selectedProduct.getStock()) {
+                    int totalBotol = qty * selectedUnit.getJumlah();
+                    if (totalBotol > selectedProduct.getStock()) {
                         JOptionPane.showMessageDialog(BuyForm.this, "Stok tidak mencukupi!");
                         return;
                     }
 
-                    // Main Proses
-                    double total = selectedProduct.getPrice() * qty; // Hitung Total
-                    selectedProduct.setPrice(selectedProduct.getOriginalPrice()); // Balikin Harga Jual jadi harga awal
-                    selectedProduct.setStock(selectedProduct.getStock() - qty); // Mengurangi Stok
+                    double hargaPerUnit = selectedProduct.getPrice() * selectedUnit.getJumlah();
+                    double total = hargaPerUnit * qty;
 
-                    JOptionPane.showMessageDialog(BuyForm.this, "Transaksi berhasil!\nTotal Harga: " + total);
+                    selectedProduct.setStock(selectedProduct.getStock() - totalBotol);
+
+                    int orderId = mainApp.getHistoryList().size() + 1;
+                    String customerName = (String) customerBox.getSelectedItem();
+                    String productName = selectedProduct.getName();
+                    LocalDateTime now = LocalDateTime.now();
+
+                    History newHistory = new History(orderId, customerName, productName, totalBotol, now);
+                    mainApp.addHistory(newHistory);
+
+                    JOptionPane.showMessageDialog(BuyForm.this, "Transaksi berhasil! Total Harga: " + total);
 
                     updateFields();
                     qtyField.setText("");
-
                     mainApp.refreshBanner();
+                    new CustomerWindow(mainApp).setVisible(true);
+                    dispose();
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(BuyForm.this, "Qty harus berupa angka.");
-
-                //   catch (NumberFormatException ex) {
-                //     JOptionPane.showMessageDialog(null.this, "Qty harus berupa angka."); juga bisa
                 }
             }
         });
 
-        // Set nilai awal dari produk pertama
+        regisButton.addActionListener(e -> {
+            new RegisForm(mainApp).setVisible(true);
+            dispose();
+        });
+
         if (!products.isEmpty()) {
-            productField.setSelectedIndex(0);
+            productBox.setSelectedIndex(0);
             updateFields();
         }
     }
 
     private void updateFields() {
-        int selectedIndex = productField.getSelectedIndex();
-        if (selectedIndex != -1) {
-            Product selectedProduct = products.get(selectedIndex);
+        int productIndex = productBox.getSelectedIndex();
+        int unitIndex = unitBox.getSelectedIndex();
+
+        if (productIndex != -1 && unitIndex != -1) {
+            Product selectedProduct = products.get(productIndex);
+            Unit selectedUnit = units.get(unitIndex);
+
             stockField.setText(String.valueOf(selectedProduct.getStock()));
-            priceField.setText(String.valueOf(selectedProduct.getPrice()));
+            double hargaPerUnit = selectedProduct.getPrice() * selectedUnit.getJumlah();
+            priceField.setText(String.valueOf(hargaPerUnit));
         }
     }
-}
+} 
