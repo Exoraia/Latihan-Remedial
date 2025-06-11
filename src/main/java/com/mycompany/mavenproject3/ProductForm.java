@@ -9,6 +9,10 @@ package com.mycompany.mavenproject3;
  * @author ASUS
  */
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -56,49 +60,88 @@ public class ProductForm extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
         
+        JLabel titleLabel = new JLabel("Kelola Produk");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        add(titleLabel, BorderLayout.NORTH);
+
         // Panel form pemesanan
-        JPanel formPanel = new JPanel();
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        // Kode
+        gbc.gridx = 0; gbc.gridy = 0;
         formPanel.add(new JLabel("Kode Barang"));
-        codeField = new JTextField(5);
+
+        codeField = new JTextField(8);
+        gbc.gridx = 1;
         formPanel.add(codeField);
         
-        formPanel.add(new JLabel("Nama Barang:"));
+        // Nama Barang
+        gbc.gridx = 0; gbc.gridy = 1;
+        formPanel.add(new JLabel("Nama Barang:"), gbc);
+        
         nameField = new JTextField(8);
-        formPanel.add(nameField);
+        gbc.gridx = 1;
+        formPanel.add(nameField, gbc);
         
-        formPanel.add(new JLabel("Kategori:"));
-        categoryField = new JComboBox<>(new String[]{"Coffee", "Dairy", "Juice", "Soda", "Tea"});
-        formPanel.add(categoryField);
-        
-        formPanel.add(new JLabel("Harga Jual:"));
-        priceField = new JTextField(7);
-        formPanel.add(priceField);
-        
-        formPanel.add(new JLabel("Stok Tersedia:"));
-        stockField = new JTextField(5);
-        formPanel.add(stockField);
-        
-        saveButton = new JButton("Simpan");
-        formPanel.add(saveButton);
+        // Kategori
+        gbc.gridx = 0; gbc.gridy = 2;
+        formPanel.add(new JLabel("Kategori:"), gbc);
 
-        editButton = new JButton("Edit");
-        formPanel.add(editButton);
+        categoryField = new JComboBox<>(new String[]{"Coffee", "Dairy", "Juice", "Soda", "Tea"});
+        gbc.gridx = 1; 
+        formPanel.add(categoryField, gbc);
         
+        // Harga Jual
+        gbc.gridx = 0; gbc.gridy = 3;
+        formPanel.add(new JLabel("Harga Jual:"), gbc);
+        
+        priceField = new JTextField(8);
+        gbc.gridx = 1;
+        formPanel.add(priceField, gbc);
+        
+        // Stok
+        gbc.gridx = 0; gbc.gridy = 4;
+        formPanel.add(new JLabel("Stok Tersedia:"), gbc);
+        
+        stockField = new JTextField(8);
+        gbc.gridx = 1; 
+        formPanel.add(stockField, gbc);
+        
+        // Simpan
+        gbc.gridx = 0; gbc.gridy = 5;
+        saveButton = new JButton("Simpan");
+        formPanel.add(saveButton, gbc);
+
+        // Edit
+        gbc.gridx = 0; gbc.gridy = 6;
+        editButton = new JButton("Edit");
+        formPanel.add(editButton, gbc);
+        
+        // Hapus
+        gbc.gridx = 0; gbc.gridy = 7;
         deleteButton = new JButton("Hapus");
-        formPanel.add(deleteButton);
+        formPanel.add(deleteButton, gbc);
 
         tableModel = new DefaultTableModel(new String[]{"Kode", "Nama", "Kategori", "Harga Jual", "Stok"}, 0);
         drinkTable = new JTable(tableModel);
         loadProductData(products);
 
         // Menampilkan panel CRUD
-        add(formPanel, BorderLayout.NORTH);
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(formPanel, BorderLayout.NORTH);
+
+        // Tambahkan ke frame
+        add(leftPanel, BorderLayout.WEST);
+
         
         // Menampilkan tabel data
         JScrollPane scrollPane = new JScrollPane(drinkTable);
         add(scrollPane, BorderLayout.CENTER);
 
-        
         saveButton.addActionListener(e -> {
             int selectedRow = drinkTable.getSelectedRow();
             String code = codeField.getText();

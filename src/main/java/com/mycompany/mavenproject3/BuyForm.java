@@ -142,6 +142,8 @@ public class BuyForm extends JFrame {
 
         add(buyPanel);
 
+        this.products = mainApp.getProductList();
+
         productBox.addActionListener(e -> updateFields());
         unitBox.addActionListener(e -> updateFields());
 

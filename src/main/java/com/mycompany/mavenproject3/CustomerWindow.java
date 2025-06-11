@@ -72,7 +72,6 @@ class CustomerWindow extends JFrame {
         
         buyProductButton.addActionListener(e -> {
             new BuyForm(mainApp).setVisible(true);
-            dispose();
         });
         
         add(topPanel, BorderLayout.NORTH);

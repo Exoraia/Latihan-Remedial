@@ -23,7 +23,6 @@ public class Unit {
     public void setSatuan(String satuan) { this.satuan = satuan; }
     public void setJumlah(int jumlah) { this.jumlah = jumlah; }
 
-    // Harga unit dihitung dari harga dasar produk
     public double getHargaDariProduk(Product product) {
         double basePrice = product.getPrice();
         double discount = satuan.equalsIgnoreCase("Box") ? 0.9 : 1.0; // 10% diskon untuk box
