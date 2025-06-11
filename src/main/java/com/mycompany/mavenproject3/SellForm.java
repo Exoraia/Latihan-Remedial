@@ -4,12 +4,6 @@
  */
 package com.mycompany.mavenproject3;
 
-/**
- *
- * @author ASUS
- */
-import java.awt.BorderLayout;
-import java.awt.Container;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +18,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 
 import javax.swing.*;
+
+/**
+ *
+ * @author ASUS
+ */
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -33,17 +32,23 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 
 public class SellForm extends JFrame {
-    private JComboBox<String> productField;
+    private JComboBox<String> productBox;
+    private JComboBox<String> unitBox;
     private JTextField stockField;
     private JTextField priceField;
     private JTextField qtyField;
     private JButton processButton;
     private List<Product> products;
+    private List<Unit> units;
     private Mavenproject3 mainApp;
 
     public SellForm(Mavenproject3 mainApp) {
         this.mainApp = mainApp;
         this.products = mainApp.getProductList();
+
+        this.units = new ArrayList<>();
+        units.add(new Unit("Botol", 1));
+        units.add(new Unit("Box", 12));
 
         setTitle("WK. Cuan | Jual Barang");
         setSize(400, 300);
@@ -59,12 +64,12 @@ public class SellForm extends JFrame {
         gbc.gridx = 0; gbc.gridy = 0;
         sellPanel.add(new JLabel("Barang:"), gbc);
 
-        productField = new JComboBox<>();
+        productBox = new JComboBox<>();
         for (Product p : products) {
-            productField.addItem(p.getName());
+            productBox.addItem(p.getName());
         }
         gbc.gridx = 1;
-        sellPanel.add(productField, gbc);
+        sellPanel.add(productBox, gbc);
 
         // Stok
         gbc.gridx = 0; gbc.gridy = 1;
@@ -84,8 +89,19 @@ public class SellForm extends JFrame {
         gbc.gridx = 1;
         sellPanel.add(priceField, gbc);
 
-        // Qty
+        // Satuan
         gbc.gridx = 0; gbc.gridy = 3;
+        sellPanel.add(new JLabel("Satuan:"), gbc);
+
+        unitBox = new JComboBox<>();
+        for (Unit u : units) {
+            unitBox.addItem(u.getSatuan());
+        }
+        gbc.gridx = 1;
+        sellPanel.add(unitBox, gbc);
+
+        // Qty
+        gbc.gridx = 0; gbc.gridy = 4;
         sellPanel.add(new JLabel("Qty:"), gbc);
 
         qtyField = new JTextField(10);
@@ -94,19 +110,20 @@ public class SellForm extends JFrame {
 
         // Tombol proses
         processButton = new JButton("Proses");
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
         sellPanel.add(processButton, gbc);
 
         add(sellPanel);
 
         // Listener: Update stok dan harga saat produk dipilih
-        productField.addActionListener(e -> updateFields());
+        productBox.addActionListener(e -> updateFields());
+        unitBox.addActionListener(e -> updateFields());
 
         // Listener: Tombol Proses
         processButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                int selectedIndex = productField.getSelectedIndex();
+                int selectedIndex = productBox.getSelectedIndex();
                 Product selectedProduct = products.get(selectedIndex);
                 try {
                     int qty = Integer.parseInt(qtyField.getText());
@@ -136,17 +153,22 @@ public class SellForm extends JFrame {
 
         // Set nilai awal dari produk pertama
         if (!products.isEmpty()) {
-            productField.setSelectedIndex(0);
+            productBox.setSelectedIndex(0);
             updateFields();
         }
     }
 
     private void updateFields() {
-        int selectedIndex = productField.getSelectedIndex();
-        if (selectedIndex != -1) {
-            Product selectedProduct = products.get(selectedIndex);
+        int productIndex = productBox.getSelectedIndex();
+        int unitIndex = unitBox.getSelectedIndex();
+
+        if (productIndex != -1 && unitIndex != -1) {
+            Product selectedProduct = products.get(productIndex);
+            Unit selectedUnit = units.get(unitIndex);
+
             stockField.setText(String.valueOf(selectedProduct.getStock()));
-            priceField.setText(String.valueOf(selectedProduct.getPrice()));
+            double hargaPerUnit = selectedProduct.getPrice() * selectedUnit.getJumlah();
+            priceField.setText(String.valueOf(hargaPerUnit));
         }
     }
 }

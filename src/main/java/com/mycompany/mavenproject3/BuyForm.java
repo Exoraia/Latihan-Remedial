@@ -62,7 +62,7 @@ public class BuyForm extends JFrame {
         units.add(new Unit("Box", 12));
 
         setTitle("WK. Cuan | Beli Barang");
-        setSize(400, 300);
+        setSize(400, 400);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -93,8 +93,26 @@ public class BuyForm extends JFrame {
         gbc.gridx = 1;
         buyPanel.add(productBox, gbc);
 
-        // Satuan
+        // Stok
         gbc.gridx = 0; gbc.gridy = 2;
+        buyPanel.add(new JLabel("Stok Tersedia:"), gbc);
+
+        stockField = new JTextField(10);
+        stockField.setEditable(false);
+        gbc.gridx = 1;
+        buyPanel.add(stockField, gbc);
+
+        // Harga Jual
+        gbc.gridx = 0; gbc.gridy = 3;
+        buyPanel.add(new JLabel("Harga Jual:"), gbc);
+
+        priceField = new JTextField(10);
+        priceField.setEditable(false);
+        gbc.gridx = 1;
+        buyPanel.add(priceField, gbc);
+        
+        // Satuan
+        gbc.gridx = 0; gbc.gridy = 4;
         buyPanel.add(new JLabel("Satuan:"), gbc);
 
         unitBox = new JComboBox<>();
@@ -104,27 +122,9 @@ public class BuyForm extends JFrame {
         gbc.gridx = 1;
         buyPanel.add(unitBox, gbc);
 
-        // Stok
-        gbc.gridx = 0; gbc.gridy = 3;
-        buyPanel.add(new JLabel("Stok:"), gbc);
-
-        stockField = new JTextField(10);
-        stockField.setEditable(false);
-        gbc.gridx = 1;
-        buyPanel.add(stockField, gbc);
-
-        // Harga Jual
-        gbc.gridx = 0; gbc.gridy = 4;
-        buyPanel.add(new JLabel("Harga Jual:"), gbc);
-
-        priceField = new JTextField(10);
-        priceField.setEditable(false);
-        gbc.gridx = 1;
-        buyPanel.add(priceField, gbc);
-
         // Qty
         gbc.gridx = 0; gbc.gridy = 5;
-        buyPanel.add(new JLabel("Qty:"), gbc);
+        buyPanel.add(new JLabel("Jumlah Beli:"), gbc);
 
         qtyField = new JTextField(10);
         gbc.gridx = 1;
@@ -190,7 +190,6 @@ public class BuyForm extends JFrame {
                     updateFields();
                     qtyField.setText("");
                     mainApp.refreshBanner();
-                    new CustomerWindow(mainApp).setVisible(true);
                     dispose();
                 } catch (NumberFormatException ex) {
                     JOptionPane.showMessageDialog(BuyForm.this, "Qty harus berupa angka.");

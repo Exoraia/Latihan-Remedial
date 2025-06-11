@@ -9,6 +9,10 @@ package com.mycompany.mavenproject3;
  * @author ASUS
  */
 import java.awt.BorderLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.Font;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,39 +49,72 @@ public class CustomerForm extends JFrame {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);
 
-        JPanel formPanel = new JPanel();
-        formPanel.add(new JLabel("Nama:"));
+        JLabel titleLabel = new JLabel("Kelola Customer");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 30));
+        titleLabel.setHorizontalAlignment(JLabel.CENTER);
+        add(titleLabel, BorderLayout.NORTH);
+
+        JPanel formPanel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(8, 8, 8, 8);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        gbc.gridx = 0; gbc.gridy = 0;
+        formPanel.add(new JLabel("Nama:"), gbc);
+
         nameField = new JTextField(10);
-        formPanel.add(nameField);
+        gbc.gridx = 1;
+        formPanel.add(nameField, gbc);
 
-        formPanel.add(new JLabel("Email:"));
+        gbc.gridx = 0; gbc.gridy = 1;
+        formPanel.add(new JLabel("Email:"), gbc);
+
         emailField = new JTextField(10);
-        formPanel.add(emailField);
+        gbc.gridx = 1;         
+        formPanel.add(emailField, gbc);
 
-        formPanel.add(new JLabel("Password:"));
+        gbc.gridx = 0; gbc.gridy = 2;
+        formPanel.add(new JLabel("Password:"), gbc);
+        
         passField = new JTextField(10);
-        formPanel.add(passField);
+        gbc.gridx = 1;
+        formPanel.add(passField, gbc);
 
-        formPanel.add(new JLabel("Gender:"));
+        gbc.gridx = 0; gbc.gridy = 3;
+        formPanel.add(new JLabel("Gender:"), gbc);
+        
         genderBox = new JComboBox<>(new String[]{"Pria", "Wanita"});
-        formPanel.add(genderBox);
+        gbc.gridx = 1; 
+        formPanel.add(genderBox, gbc);
 
+        // Simpan
+        gbc.gridx = 0; gbc.gridy = 4;
         saveButton = new JButton("Simpan");
-        formPanel.add(saveButton);
+        formPanel.add(saveButton, gbc);
 
+        // Edit
+        gbc.gridx = 0; gbc.gridy = 5;
         editButton = new JButton("Edit");
-        formPanel.add(editButton);
-
+        formPanel.add(editButton, gbc);
+        
+        // Hapus
+        gbc.gridx = 0; gbc.gridy = 6;
         deleteButton = new JButton("Hapus");
-        formPanel.add(deleteButton);
+        formPanel.add(deleteButton, gbc);
 
         tableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Email", "Password", "Gender"}, 0);
         customerTable = new JTable(tableModel);
         loadCustomerData(customers);
 
         JScrollPane scrollPane = new JScrollPane(customerTable);
-        add(formPanel, BorderLayout.NORTH);
         add(scrollPane, BorderLayout.CENTER);
+
+        // Menampilkan panel CRUD
+        JPanel leftPanel = new JPanel(new BorderLayout());
+        leftPanel.add(formPanel, BorderLayout.NORTH);
+
+        // Tambahkan ke frame
+        add(leftPanel, BorderLayout.WEST);
 
         saveButton.addActionListener(e -> {
             String name = nameField.getText();
