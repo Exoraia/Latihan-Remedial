@@ -126,7 +126,7 @@ public class ProductForm extends JFrame {
             String code = codeField.getText();
             String name = nameField.getText();
             String category = (String) categoryField.getSelectedItem();
-            String priceText = priceField.getText().replace(".", ". ").replace(",", "");
+            String priceText = priceField.getText().replace(".", "").replace(",", "");
             String stockText = stockField.getText();
 
             if (code.isEmpty() || name.isEmpty() || priceText.isEmpty() || stockText.isEmpty()) {
@@ -169,7 +169,7 @@ public class ProductForm extends JFrame {
                 categoryField.setSelectedItem(drinkTable.getValueAt(selectedRow, 2).toString());
 
                 String hargaFormatted = drinkTable.getValueAt(selectedRow, 3).toString()
-                        .replace("Rp", "").replace(".", ". ").trim();
+                        .replace("Rp", "").replace(".", "").trim();
                 priceField.setText(hargaFormatted);
 
                 stockField.setText(drinkTable.getValueAt(selectedRow, 4).toString());
