@@ -41,7 +41,7 @@ public class HistoryForm extends JFrame {
         setLocationRelativeTo(null);
         
         // Tabel
-        tableModel = new DefaultTableModel(new String[]{"ID Pesanan", "Nama", "Pesanan", "Jumlah", "Waktu Pemesanan"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID Pesanan", "Nama", "Pesanan", "Jumlah", "Jumlah Pembayaran", "Waktu Pemesanan"}, 0);
         historyTable = new JTable(tableModel);
         loadProductData(history);
 
@@ -64,9 +64,19 @@ public class HistoryForm extends JFrame {
         tableModel.setRowCount(0); 
         for (History history : historyList) {
             tableModel.addRow(new Object[]{
-                history.getIdPesanan(), history.getNamaCustomer(), history.getNamaProduk(), history.getJumlah(), history.getWaktu()
+                history.getIdPesanan(),
+                history.getNamaCustomer(),
+                history.getNamaProduk(),
+                history.getJumlah(),
+                formatRupiah(history.getJumlahPembayaran()),
+                history.getWaktu()
             });
         }
+    }
+
+    private String formatRupiah(double harga) {
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id", "ID"));
+        return formatter.format(harga).replace(",00", "");
     }
 
      private void applyFilter() {

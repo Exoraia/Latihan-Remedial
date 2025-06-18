@@ -7,7 +7,9 @@ package com.mycompany.mavenproject3;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -29,8 +31,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
-import java.util.List;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
@@ -48,7 +50,7 @@ public class ProductForm extends JFrame {
     private List<Product> products;
     private boolean isEditMode = false;
 
-    public ProductForm(Mavenproject3 mainApp) {
+   public ProductForm(Mavenproject3 mainApp) {
         this.products = mainApp.getProductList();
 
         setTitle("WK. Cuan | Stok Barang");
@@ -124,7 +126,7 @@ public class ProductForm extends JFrame {
             String code = codeField.getText();
             String name = nameField.getText();
             String category = (String) categoryField.getSelectedItem();
-            String priceText = priceField.getText();
+            String priceText = priceField.getText().replace(".", ". ").replace(",", "");
             String stockText = stockField.getText();
 
             if (code.isEmpty() || name.isEmpty() || priceText.isEmpty() || stockText.isEmpty()) {
@@ -140,12 +142,12 @@ public class ProductForm extends JFrame {
                     tableModel.setValueAt(code, selectedRow, 0);
                     tableModel.setValueAt(name, selectedRow, 1);
                     tableModel.setValueAt(category, selectedRow, 2);
-                    tableModel.setValueAt(price, selectedRow, 3);
+                    tableModel.setValueAt(formatRupiah(price), selectedRow, 3);
                     tableModel.setValueAt(stock, selectedRow, 4);
                     products.set(selectedRow, new Product(0, code, name, category, price, stock));
                     JOptionPane.showMessageDialog(this, "Data berhasil diperbarui.");
                 } else {
-                    tableModel.addRow(new Object[]{code, name, category, price, stock});
+                    tableModel.addRow(new Object[]{code, name, category, formatRupiah(price), stock});
                     products.add(new Product(0, code, name, category, price, stock));
                     JOptionPane.showMessageDialog(this, "Data berhasil ditambahkan.");
                 }
@@ -165,7 +167,11 @@ public class ProductForm extends JFrame {
                 codeField.setText(drinkTable.getValueAt(selectedRow, 0).toString());
                 nameField.setText(drinkTable.getValueAt(selectedRow, 1).toString());
                 categoryField.setSelectedItem(drinkTable.getValueAt(selectedRow, 2).toString());
-                priceField.setText(drinkTable.getValueAt(selectedRow, 3).toString());
+
+                String hargaFormatted = drinkTable.getValueAt(selectedRow, 3).toString()
+                        .replace("Rp", "").replace(".", ". ").trim();
+                priceField.setText(hargaFormatted);
+
                 stockField.setText(drinkTable.getValueAt(selectedRow, 4).toString());
                 isEditMode = true;
             } else {
@@ -195,10 +201,16 @@ public class ProductForm extends JFrame {
     }
 
     private void loadProductData(List<Product> productList) {
+        tableModel.setRowCount(0);
         for (Product product : productList) {
             tableModel.addRow(new Object[]{
-                product.getCode(), product.getName(), product.getCategory(), product.getPrice(), product.getStock()
+                    product.getCode(), product.getName(), product.getCategory(), formatRupiah(product.getPrice()), product.getStock()
             });
         }
+    }
+
+    private String formatRupiah(double harga) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return formatter.format(harga).replace(",00", ""); // hapus desimal
     }
 }

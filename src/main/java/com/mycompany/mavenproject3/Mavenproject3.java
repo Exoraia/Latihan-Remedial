@@ -14,10 +14,8 @@ public class Mavenproject3 extends JFrame {
 
     private List<Product> productList = new ArrayList<>();
     private List<Customer> customerList = new ArrayList<>();
-    private List<Unit> unitList = new ArrayList<>();
     private List<History> historyList = new ArrayList<>();
-
-    private JPanel menuPanel; // panel untuk menggantikan banner bergerak
+    private JPanel menuPanel;
 
     public Mavenproject3() {
         setTitle("WK. STI Chill | Tampilan Penjual");
@@ -27,9 +25,9 @@ public class Mavenproject3 extends JFrame {
         setLayout(new BorderLayout());
 
         productList.add(new Product(1, "P001", "Americano", "Coffee", 10000, 100));
-        productList.add(new Product(2, "P002", "Pandan Latte", "Diary", 20000, 100));
+        productList.add(new Product(2, "P002", "Pandan Latte", "Dairy", 20000, 100));
         productList.add(new Product(3, "P003", "Root Beer", "Soda", 15000, 100));
-        productList.add(new Product(4, "P004", "Matcha Frappucino", "Tea", 28000, 100));
+        productList.add(new Product(4, "P004", "Matcha Frappuccino", "Tea", 28000, 100));
         productList.add(new Product(5, "P005", "Jus Apel", "Juice", 17000, 100));
 
         customerList.add(new Customer(1, "Karbit", "+621312421421", "john.terry@itbss.ac.id", "kopisusuventi", true));
@@ -93,7 +91,7 @@ public class Mavenproject3 extends JFrame {
         gbc.insets = new Insets(8, 25, 8, 25);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        String[] categories = { "Coffee", "Diary", "Juice", "Soda", "Tea" };
+        String[] categories = { "Coffee", "Dairy", "Juice", "Soda", "Tea" };
 
         for (int column = 0; column < categories.length; column++) {
             String category = categories[column];

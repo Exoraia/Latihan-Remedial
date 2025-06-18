@@ -6,6 +6,7 @@ package com.mycompany.mavenproject3;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -26,6 +27,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -45,10 +47,10 @@ public class SellForm extends JFrame {
 
     private Mavenproject3 mainApp;
 
-    public SellForm(Mavenproject3 app) {
-        this.mainApp = app;
-        this.products = app.getProductList(); // ✅ List produk dari mainApp
-        this.customers = app.getCustomerList(); // ✅ List customer dari mainApp
+        public SellForm(Mavenproject3 mainApp) {
+        this.mainApp = mainApp;
+        this.products = mainApp.getProductList(); 
+        this.customers = mainApp.getCustomerList(); 
         this.units = new ArrayList<>();
         units.add(new Unit("Botol", 1));
         units.add(new Unit("Box", 12));
@@ -129,13 +131,12 @@ public class SellForm extends JFrame {
 
         add(sellPanel);
 
-        // Listener update info saat produk/satuan dipilih
         productBox.addActionListener(e -> updateInfo());
         unitBox.addActionListener(e -> updateInfo());
 
         processButton.addActionListener(e -> processTransaction());
 
-        updateInfo(); // tampilkan data awal
+        updateInfo(); 
     }
 
     private void updateInfo() {
@@ -149,33 +150,49 @@ public class SellForm extends JFrame {
             double unitPrice = selectedProduct.getOriginalPrice() * unit.getJumlah();
 
             stockField.setText(String.valueOf(availableUnitStock));
-            priceField.setText(String.valueOf(unitPrice));
+            priceField.setText(formatRupiah(unitPrice));
         }
     }
 
     private void processTransaction() {
         try {
             String productName = (String) productBox.getSelectedItem();
+            String customerName = (String) customerBox.getSelectedItem();
             Product selectedProduct = getProductByName(productName);
             Unit unit = getUnit((String) unitBox.getSelectedItem());
             int qty = Integer.parseInt(qtyField.getText());
 
+            if (qty <= 0) {
+                JOptionPane.showMessageDialog(this, "Qty harus lebih dari 0");
+                return;
+            }
+
+            if (selectedProduct == null || unit == null) {
+                JOptionPane.showMessageDialog(this, "Produk atau Satuan tidak valid");
+                return;
+            }
+
             int totalBotol = qty * unit.getJumlah();
+            int totalHargaInt = (int)(totalBotol * selectedProduct.getOriginalPrice());
+
             if (selectedProduct.getStock() >= totalBotol) {
-                // Kurangi stok
                 selectedProduct.setStock(selectedProduct.getStock() - totalBotol);
 
-                // Tambahkan ke riwayat
-                int orderId = mainApp.getHistoryList().size() + 1;
-                String customerName = (String) customerBox.getSelectedItem();
-                LocalDateTime now = LocalDateTime.now();
+                History newHistory = new History(
+                    mainApp.getHistoryList().size() + 1,
+                    customerName,
+                    productName,
+                    totalBotol,
+                    totalHargaInt,
+                    LocalDateTime.now()
+                );
 
-                History newHistory = new History(orderId, customerName, productName, totalBotol, now);
                 mainApp.addHistory(newHistory);
+                mainApp.refreshBanner();
 
-                JOptionPane.showMessageDialog(this, "Transaksi berhasil!");
+                JOptionPane.showMessageDialog(this, "Transaksi berhasil\nTotal: " + formatRupiah(totalHargaInt));
+                qtyField.setText("");
                 updateInfo();
-                mainApp.refreshBanner(); // update banner jika perlu
             } else {
                 JOptionPane.showMessageDialog(this, "Stok tidak mencukupi!");
             }
@@ -196,5 +213,10 @@ public class SellForm extends JFrame {
             if (u.getSatuan().equalsIgnoreCase(name)) return u;
         }
         return null;
+    }
+
+    private String formatRupiah(double harga) {
+        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        return formatter.format(harga).replace(",00", "");
     }
 }

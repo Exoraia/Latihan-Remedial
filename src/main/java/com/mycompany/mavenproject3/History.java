@@ -14,13 +14,15 @@ public class History {
     private String namaCustomer;
     private String namaProduk;
     private int jumlah;
+    private int jumlahPembayaran;
     private LocalDateTime waktu;
 
-    public History(int idPesanan, String namaCustomer, String namaProduk, int jumlah, LocalDateTime waktu) {
+    public History(int idPesanan, String namaCustomer, String namaProduk, int jumlah, int jumlahPembayaran, LocalDateTime waktu) {
         this.idPesanan = idPesanan;
         this.namaCustomer = namaCustomer;
         this.namaProduk = namaProduk;
         this.jumlah = jumlah;
+        this.jumlahPembayaran = jumlahPembayaran;
         this.waktu = waktu;
     }
 
@@ -28,6 +30,7 @@ public class History {
     public String getNamaCustomer() { return namaCustomer; }
     public String getNamaProduk() { return namaProduk; }
     public int getJumlah() { return jumlah; }
+    public int getJumlahPembayaran() { return jumlahPembayaran; }
     public LocalDateTime getWaktu() { return waktu; }
     
     public void setJumlah(int jumlah) { this.jumlah = jumlah; }
