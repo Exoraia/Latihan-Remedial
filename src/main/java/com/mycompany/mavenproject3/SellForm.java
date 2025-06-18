@@ -26,42 +26,56 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
-
 public class SellForm extends JFrame {
     private JComboBox<String> productBox;
     private JComboBox<String> unitBox;
+    private JComboBox<String> customerBox;
     private JTextField stockField;
     private JTextField priceField;
     private JTextField qtyField;
     private JButton processButton;
     private List<Product> products;
     private List<Unit> units;
+    private List<Customer> customers;
+
     private Mavenproject3 mainApp;
 
-    public SellForm(Mavenproject3 mainApp) {
-        this.mainApp = mainApp;
-        this.products = mainApp.getProductList();
-
+    public SellForm(Mavenproject3 app) {
+        this.mainApp = app;
+        this.products = app.getProductList(); // ✅ List produk dari mainApp
+        this.customers = app.getCustomerList(); // ✅ List customer dari mainApp
         this.units = new ArrayList<>();
         units.add(new Unit("Botol", 1));
         units.add(new Unit("Box", 12));
 
-        setTitle("WK. Cuan | Jual Barang");
-        setSize(400, 300);
-        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        setTitle("Form Penjualan");
+        setSize(300, 350);
         setLocationRelativeTo(null);
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel sellPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(8, 8, 8, 8);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // Dropdown produk
+        // Customer
         gbc.gridx = 0; gbc.gridy = 0;
+        sellPanel.add(new JLabel("Customer:"), gbc);
+
+        customerBox = new JComboBox<>();
+        for (Customer c : customers) {
+            customerBox.addItem(c.getName());
+        }
+        gbc.gridx = 1;
+        sellPanel.add(customerBox, gbc);
+
+        // Barang
+        gbc.gridx = 0; gbc.gridy = 1;
         sellPanel.add(new JLabel("Barang:"), gbc);
 
         productBox = new JComboBox<>();
@@ -71,8 +85,8 @@ public class SellForm extends JFrame {
         gbc.gridx = 1;
         sellPanel.add(productBox, gbc);
 
-        // Stok
-        gbc.gridx = 0; gbc.gridy = 1;
+        // Stok Tersedia
+        gbc.gridx = 0; gbc.gridy = 2;
         sellPanel.add(new JLabel("Stok Tersedia:"), gbc);
 
         stockField = new JTextField(10);
@@ -80,8 +94,8 @@ public class SellForm extends JFrame {
         gbc.gridx = 1;
         sellPanel.add(stockField, gbc);
 
-        // Harga
-        gbc.gridx = 0; gbc.gridy = 2;
+        // Harga Jual
+        gbc.gridx = 0; gbc.gridy = 3;
         sellPanel.add(new JLabel("Harga Jual:"), gbc);
 
         priceField = new JTextField(10);
@@ -90,7 +104,7 @@ public class SellForm extends JFrame {
         sellPanel.add(priceField, gbc);
 
         // Satuan
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 4;
         sellPanel.add(new JLabel("Satuan:"), gbc);
 
         unitBox = new JComboBox<>();
@@ -101,74 +115,86 @@ public class SellForm extends JFrame {
         sellPanel.add(unitBox, gbc);
 
         // Qty
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 5;
         sellPanel.add(new JLabel("Qty:"), gbc);
 
         qtyField = new JTextField(10);
         gbc.gridx = 1;
         sellPanel.add(qtyField, gbc);
 
-        // Tombol proses
+        // Tombol Proses
         processButton = new JButton("Proses");
-        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         sellPanel.add(processButton, gbc);
 
         add(sellPanel);
 
-        // Listener: Update stok dan harga saat produk dipilih
-        productBox.addActionListener(e -> updateFields());
-        unitBox.addActionListener(e -> updateFields());
+        // Listener update info saat produk/satuan dipilih
+        productBox.addActionListener(e -> updateInfo());
+        unitBox.addActionListener(e -> updateInfo());
 
-        // Listener: Tombol Proses
-        processButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                int selectedIndex = productBox.getSelectedIndex();
-                Product selectedProduct = products.get(selectedIndex);
-                try {
-                    int qty = Integer.parseInt(qtyField.getText());
+        processButton.addActionListener(e -> processTransaction());
 
-                    if (qty <= 0) {
-                        JOptionPane.showMessageDialog(SellForm.this, "Qty harus lebih dari 0.");
-                        return;
-                    }
+        updateInfo(); // tampilkan data awal
+    }
 
-                    if (qty > selectedProduct.getStock()) {
-                        JOptionPane.showMessageDialog(SellForm.this, "Stok tidak mencukupi!");
-                        return;
-                    }
+    private void updateInfo() {
+        String productName = (String) productBox.getSelectedItem();
+        String unitName = (String) unitBox.getSelectedItem();
+        Product selectedProduct = getProductByName(productName);
+        Unit unit = getUnit(unitName);
 
-                    selectedProduct.setStock(selectedProduct.getStock() - qty);
-                    JOptionPane.showMessageDialog(SellForm.this, "Transaksi berhasil!\nSisa stok: " + selectedProduct.getStock());
+        if (selectedProduct != null && unit != null) {
+            int availableUnitStock = selectedProduct.getStock() / unit.getJumlah();
+            double unitPrice = selectedProduct.getOriginalPrice() * unit.getJumlah();
 
-                    updateFields();
-                    qtyField.setText("");
-
-                    mainApp.refreshBanner();
-                } catch (NumberFormatException ex) {
-                    JOptionPane.showMessageDialog(SellForm.this, "Qty harus berupa angka.");
-                }
-            }
-        });
-
-        // Set nilai awal dari produk pertama
-        if (!products.isEmpty()) {
-            productBox.setSelectedIndex(0);
-            updateFields();
+            stockField.setText(String.valueOf(availableUnitStock));
+            priceField.setText(String.valueOf(unitPrice));
         }
     }
 
-    private void updateFields() {
-        int productIndex = productBox.getSelectedIndex();
-        int unitIndex = unitBox.getSelectedIndex();
+    private void processTransaction() {
+        try {
+            String productName = (String) productBox.getSelectedItem();
+            Product selectedProduct = getProductByName(productName);
+            Unit unit = getUnit((String) unitBox.getSelectedItem());
+            int qty = Integer.parseInt(qtyField.getText());
 
-        if (productIndex != -1 && unitIndex != -1) {
-            Product selectedProduct = products.get(productIndex);
-            Unit selectedUnit = units.get(unitIndex);
+            int totalBotol = qty * unit.getJumlah();
+            if (selectedProduct.getStock() >= totalBotol) {
+                // Kurangi stok
+                selectedProduct.setStock(selectedProduct.getStock() - totalBotol);
 
-            stockField.setText(String.valueOf(selectedProduct.getStock()));
-            double hargaPerUnit = selectedProduct.getPrice() * selectedUnit.getJumlah();
-            priceField.setText(String.valueOf(hargaPerUnit));
+                // Tambahkan ke riwayat
+                int orderId = mainApp.getHistoryList().size() + 1;
+                String customerName = (String) customerBox.getSelectedItem();
+                LocalDateTime now = LocalDateTime.now();
+
+                History newHistory = new History(orderId, customerName, productName, totalBotol, now);
+                mainApp.addHistory(newHistory);
+
+                JOptionPane.showMessageDialog(this, "Transaksi berhasil!");
+                updateInfo();
+                mainApp.refreshBanner(); // update banner jika perlu
+            } else {
+                JOptionPane.showMessageDialog(this, "Stok tidak mencukupi!");
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(this, "Qty harus angka!");
         }
+    }
+
+    private Product getProductByName(String name) {
+        for (Product p : products) {
+            if (p.getName().equalsIgnoreCase(name)) return p;
+        }
+        return null;
+    }
+
+    private Unit getUnit(String name) {
+        for (Unit u : units) {
+            if (u.getSatuan().equalsIgnoreCase(name)) return u;
+        }
+        return null;
     }
 }

@@ -33,6 +33,7 @@ public class CustomerForm extends JFrame {
     private DefaultTableModel tableModel;
     private JTextField codeField;
     private JTextField nameField;
+    private JTextField nohpField;
     private JTextField emailField;
     private JTextField passField;
     private JComboBox genderBox;
@@ -67,20 +68,27 @@ public class CustomerForm extends JFrame {
         formPanel.add(nameField, gbc);
 
         gbc.gridx = 0; gbc.gridy = 1;
+        formPanel.add(new JLabel("Nomor HP:"), gbc);
+
+        nohpField = new JTextField(10);
+        gbc.gridx = 1;         
+        formPanel.add(nohpField, gbc);
+
+        gbc.gridx = 0; gbc.gridy = 2;
         formPanel.add(new JLabel("Email:"), gbc);
 
         emailField = new JTextField(10);
         gbc.gridx = 1;         
         formPanel.add(emailField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 2;
+        gbc.gridx = 0; gbc.gridy = 3;
         formPanel.add(new JLabel("Password:"), gbc);
         
         passField = new JTextField(10);
         gbc.gridx = 1;
         formPanel.add(passField, gbc);
 
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 4;
         formPanel.add(new JLabel("Gender:"), gbc);
         
         genderBox = new JComboBox<>(new String[]{"Pria", "Wanita"});
@@ -88,21 +96,21 @@ public class CustomerForm extends JFrame {
         formPanel.add(genderBox, gbc);
 
         // Simpan
-        gbc.gridx = 0; gbc.gridy = 4;
+        gbc.gridx = 0; gbc.gridy = 5; gbc.gridwidth = 2;
         saveButton = new JButton("Simpan");
         formPanel.add(saveButton, gbc);
 
         // Edit
-        gbc.gridx = 0; gbc.gridy = 5;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         editButton = new JButton("Edit");
         formPanel.add(editButton, gbc);
         
         // Hapus
-        gbc.gridx = 0; gbc.gridy = 6;
+        gbc.gridx = 0; gbc.gridy = 7; gbc.gridwidth = 2;
         deleteButton = new JButton("Hapus");
         formPanel.add(deleteButton, gbc);
 
-        tableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Email", "Password", "Gender"}, 0);
+        tableModel = new DefaultTableModel(new String[]{"ID", "Nama", "Nomor HP", "Email", "Password", "Gender"}, 0);
         customerTable = new JTable(tableModel);
         loadCustomerData(customers);
 
@@ -118,11 +126,12 @@ public class CustomerForm extends JFrame {
 
         saveButton.addActionListener(e -> {
             String name = nameField.getText();
+            String nohp = nohpField.getText();
             String email = emailField.getText();
             String password = passField.getText();
             String gender = (String) genderBox.getSelectedItem();
 
-            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (name.isEmpty() || nohp.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -131,24 +140,27 @@ public class CustomerForm extends JFrame {
             if (selectedRow != -1) {
                 Customer customer = customers.get(selectedRow);
                 customer.setName(name);
+                customer.setNohp(nohp);
                 customer.setEmail(email);
                 customer.setPassword(password);
                 customer.setGender("Pria".equals(gender));
 
                 tableModel.setValueAt(name, selectedRow, 1);
-                tableModel.setValueAt(email, selectedRow, 2);
-                tableModel.setValueAt(password, selectedRow, 3);
-                tableModel.setValueAt(gender, selectedRow, 4);
+                tableModel.setValueAt(nohp, selectedRow, 2);
+                tableModel.setValueAt(email, selectedRow, 3);
+                tableModel.setValueAt(password, selectedRow, 4);
+                tableModel.setValueAt(gender, selectedRow, 5);
 
                 JOptionPane.showMessageDialog(this, "Data berhasil diperbarui.");
             } else {
                 int newId = customers.size() + 1;
-                Customer newCustomer = new Customer(newId, name, email, password, "Pria".equals(gender));
+                Customer newCustomer = new Customer(newId, name, nohp, email, password, "Pria".equals(gender));
                 customers.add(newCustomer);
 
                 tableModel.addRow(new Object[]{
                     newCustomer.getId(),
                     newCustomer.getName(),
+                    newCustomer.getNohp(),
                     newCustomer.getEmail(),
                     newCustomer.getPassword(),
                     gender
@@ -163,9 +175,10 @@ public class CustomerForm extends JFrame {
             int selectedRow = customerTable.getSelectedRow();
             if (selectedRow != -1) {
                 nameField.setText(customerTable.getValueAt(selectedRow, 1).toString());
-                emailField.setText(customerTable.getValueAt(selectedRow, 2).toString());
-                passField.setText(customerTable.getValueAt(selectedRow, 3).toString());
-                genderBox.setSelectedItem(customerTable.getValueAt(selectedRow, 4).toString());
+                nohpField.setText(customerTable.getValueAt(selectedRow, 2).toString());
+                emailField.setText(customerTable.getValueAt(selectedRow, 3).toString());
+                passField.setText(customerTable.getValueAt(selectedRow, 4).toString());
+                genderBox.setSelectedItem(customerTable.getValueAt(selectedRow, 5).toString());
             } else {
                 JOptionPane.showMessageDialog(this, "Pilih baris yang ingin diedit!", "Peringatan", JOptionPane.WARNING_MESSAGE);
             }
@@ -188,6 +201,7 @@ public class CustomerForm extends JFrame {
             tableModel.addRow(new Object[]{
                 customer.getId(),
                 customer.getName(),
+                customer.getNohp(),
                 customer.getEmail(),
                 customer.getPassword(),
                 customer.getGender() ? "Pria" : "Wanita"
@@ -197,6 +211,7 @@ public class CustomerForm extends JFrame {
 
     private void clearForm() {
         nameField.setText("");
+        nohpField.setText("");
         emailField.setText("");
         passField.setText("");
         genderBox.setSelectedIndex(0);

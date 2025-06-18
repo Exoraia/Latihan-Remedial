@@ -33,6 +33,7 @@ import static javax.swing.WindowConstants.EXIT_ON_CLOSE;
 
 public class RegisForm extends JFrame {
     private JTextField customerField;
+    private JTextField nohpField;
     private JTextField emailField;
     private JTextField passwordField;
     private JComboBox genderBox;
@@ -70,8 +71,16 @@ public class RegisForm extends JFrame {
         gbc.gridx = 1;
         regisPanel.add(genderBox, gbc);
 
-        // Email
+        // Nomor HP
         gbc.gridx = 0; gbc.gridy = 2;
+        regisPanel.add(new JLabel("Nomor HP:"), gbc);
+
+        nohpField = new JTextField(10);
+        gbc.gridx = 1;
+        regisPanel.add(nohpField, gbc);
+
+        // Email
+        gbc.gridx = 0; gbc.gridy = 3;
         regisPanel.add(new JLabel("Email:"), gbc);
 
         emailField = new JTextField(10);
@@ -79,7 +88,7 @@ public class RegisForm extends JFrame {
         regisPanel.add(emailField, gbc);
 
         // Password
-        gbc.gridx = 0; gbc.gridy = 3;
+        gbc.gridx = 0; gbc.gridy = 4;
         regisPanel.add(new JLabel("Password:"), gbc);
 
         passwordField = new JTextField(10);
@@ -88,7 +97,7 @@ public class RegisForm extends JFrame {
 
         // Regis Button
         regisButton = new JButton("Buat Akun");
-        gbc.gridx = 0; gbc.gridy = 4; gbc.gridwidth = 2;
+        gbc.gridx = 0; gbc.gridy = 6; gbc.gridwidth = 2;
         regisPanel.add(regisButton, gbc);
 
         add(regisPanel);
@@ -96,11 +105,12 @@ public class RegisForm extends JFrame {
 
         regisButton.addActionListener(e -> {
             String nama = customerField.getText().trim();
-            String gender = (String) genderBox.getSelectedItem();
+            String nohp = nohpField.getText().trim();
             String email = emailField.getText().trim();
             String password = passwordField.getText().trim();
+            String gender = (String) genderBox.getSelectedItem();
 
-            if (nama.isEmpty() || email.isEmpty() || password.isEmpty()) {
+            if (nama.isEmpty() || nohp.isEmpty() || email.isEmpty() || password.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Semua field harus diisi!", "Peringatan", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -109,11 +119,10 @@ public class RegisForm extends JFrame {
 
             int newId = customers.size() + 1; 
             
-            Customer newCustomer = new Customer(newId, nama, email, password, genderValue);
+            Customer newCustomer = new Customer(newId, nama, nohp, email, password, genderValue);
             customers.add(newCustomer);
 
             JOptionPane.showMessageDialog(this, "Registrasi berhasil!", "Sukses", JOptionPane.INFORMATION_MESSAGE);
-            new BuyForm(mainApp).setVisible(true);
             dispose(); // tutup form setelah sukses
         });
     }
