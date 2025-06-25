@@ -168,9 +168,9 @@ public class ProductForm extends JFrame {
                 nameField.setText(drinkTable.getValueAt(selectedRow, 1).toString());
                 categoryField.setSelectedItem(drinkTable.getValueAt(selectedRow, 2).toString());
 
-                String hargaFormatted = drinkTable.getValueAt(selectedRow, 3).toString()
-                        .replace("Rp", "").replace(".", "").trim();
-                priceField.setText(hargaFormatted);
+                String hargaFormat = drinkTable.getValueAt(selectedRow, 3).toString()
+                .replace("Rp", "").replace(".", "").trim();
+                priceField.setText(hargaFormat);
 
                 stockField.setText(drinkTable.getValueAt(selectedRow, 4).toString());
                 isEditMode = true;
@@ -210,7 +210,10 @@ public class ProductForm extends JFrame {
     }
 
     private String formatRupiah(double harga) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
-        return formatter.format(harga).replace(",00", ""); // hapus desimal
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(
+            java.util.Locale.forLanguageTag("id-ID")
+        );
+        return formatter.format(harga).replace(",00", "");
     }
+
 }

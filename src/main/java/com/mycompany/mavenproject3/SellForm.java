@@ -216,7 +216,9 @@ public class SellForm extends JFrame {
     }
 
     private String formatRupiah(double harga) {
-        NumberFormat formatter = NumberFormat.getCurrencyInstance(new Locale("id", "ID"));
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(
+            java.util.Locale.forLanguageTag("id-ID")
+        );
         return formatter.format(harga).replace(",00", "");
     }
 }

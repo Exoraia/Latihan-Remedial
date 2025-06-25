@@ -67,7 +67,7 @@ public class HistoryForm extends JFrame {
                 history.getIdPesanan(),
                 history.getNamaCustomer(),
                 history.getNamaProduk(),
-                history.getJumlah(),
+                history.getJumlah() + " Botol",
                 formatRupiah(history.getJumlahPembayaran()),
                 history.getWaktu()
             });
@@ -75,11 +75,13 @@ public class HistoryForm extends JFrame {
     }
 
     private String formatRupiah(double harga) {
-        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(new java.util.Locale("id", "ID"));
+        java.text.NumberFormat formatter = java.text.NumberFormat.getCurrencyInstance(
+            java.util.Locale.forLanguageTag("id-ID")
+        );
         return formatter.format(harga).replace(",00", "");
     }
 
-     private void applyFilter() {
+    private void applyFilter() {
         String selected = (String) filterBox.getSelectedItem();
         List<History> filtered = new ArrayList<>();
 
